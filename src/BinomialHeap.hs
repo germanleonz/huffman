@@ -1,15 +1,12 @@
 {- |
- -  Adaptacion a Haskell de la implementacion de un heap binomial
- -  escrita en pseudocodigo funcional en el libro referido a
- -  continuacion
+ -  Haskell adaptation of Dr. Okasaki's binomial heap functional implementation
  -
- -  Fuente:     Purely Functional Data Structures
+ -  Source:     Purely Functional Data Structures
  -              Chris Okasaki    
  -              Cambridge University Press, 1998            
- -  Modificado: German Leon 08-10611, Ricardo Lunar 08-10655
  -}
 module BinomialHeap (
-	-- * Clase @BinomialHeap@ 
+    -- * Class @BinomialHeap@ 
     module BinomialHeap) 
 where
 
@@ -17,11 +14,11 @@ data BinomialTree a = Nodo Int a [BinomialTree a] deriving (Show, Read)
 
 data BinomialHeap a = BH [BinomialTree a] deriving (Show, Read)
 
--- | Dado un Arbol consigue el orden de este
+-- | Given a tree it obtains its height
 orden :: BinomialTree a -> Int
 orden (Nodo o e h) = o
 
--- | Dado un Arbol consigue la raiz de este
+-- | Given a tree it obtains its root
 raiz :: BinomialTree a -> a
 raiz (Nodo o e h) = e  
 
@@ -33,18 +30,18 @@ enlazar t1@(Nodo r x1 c1) t2@(Nodo _ x2 c2)
     | x1 <= x2 = Nodo (r+1) x1 (t2:c1)
     | otherwise = Nodo (r+1) x2 (t1:c2)
 
-{-| Dado un arbol y una lista de arboles, retorna el arbol enlazado a la
-    lista en la posicion que le corresponde
+{-| Given a tree and a list of trees it returns a new list with the tree
+    linked in the corresponding position
 -}
 insTree :: (Ord a) => BinomialTree a -> [BinomialTree a] -> [BinomialTree a] 
 insTree t [] = [t]
 insTree t (x:xs) = if orden t < orden x then t:(x:xs) else insTree (enlazar t x) xs
  
--- | Funcion que permite insertar una instancia de Nodo en el @BinomialHeap@
+-- | Allows to insert a Node instance in the @BinomialHeap@
 insert :: (Ord a) => a -> BinomialHeap a -> BinomialHeap a
 insert x (BH ts) = BH (insTree (Nodo 0 x []) ts)
 
--- | Funcion que permite unir dos @BinomialTree@ y devolverlos en solo uno.
+-- | Merges two @BinomialTree@ instances and returns one
 mrg :: (Ord a) => [BinomialTree a] -> [BinomialTree a] -> [BinomialTree a]
 mrg ts1 [] = ts1 
 mrg [] ts2 = ts2
@@ -65,7 +62,7 @@ findMin :: (Ord a) => BinomialHeap a -> a
 findMin (BH ts) = raiz t
     where (t,_) = removeMinTree ts
     
--- | Funcion que permite eliminar el minimo elemento de un @BinomialTree@
+-- | Eliminates the minimum element of a @BinomialTree@
 deleteMin :: (Ord a) => BinomialHeap a -> BinomialHeap a
 deleteMin (BH ts) = BH (mrg (reverse ts1) ts2)
     where (Nodo _ x ts1, ts2) = removeMinTree ts
